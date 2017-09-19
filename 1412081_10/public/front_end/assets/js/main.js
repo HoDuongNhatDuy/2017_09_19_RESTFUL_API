@@ -7,7 +7,8 @@ var alert_template = Handlebars.compile($("#alert-template").html());
 $(document).ready(update_student_list);
 
 function update_student_list() {
-    $.get(HOST_API + '/api/student', function (response) {
+    $.get(HOST_API + '/api/student')
+        .done(function (response) {
         if (response.status === 1){
             var html = student_rows_template({students: response.data});
             $('#student-list').html(html);
@@ -17,6 +18,8 @@ function update_student_list() {
                 push_alert("danger", "Fail", error);
             })
         }
+    }).fail(function (e) {
+        push_alert("danger", "Fail", "API server is not available");
     })
 }
 

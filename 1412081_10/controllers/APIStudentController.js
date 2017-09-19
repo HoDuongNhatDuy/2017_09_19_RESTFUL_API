@@ -8,7 +8,7 @@ exports.list = function(req, res, next){
             res.json({
                 status: 0,
                 data: {},
-                errors: error
+                errors: ["An error has occurred"]
             });
             return;
         }
@@ -26,7 +26,7 @@ exports.get = function(req, res, next){
             res.json({
                 status: 0,
                 data: {},
-                erros: error
+                errors: ["An error has occurred"]
 
             });
             return;
@@ -73,7 +73,7 @@ exports.insert = function (req, res, next) {
             res.json({
                 status: 0,
                 data: {},
-                erros: error
+                errors: ["An error has occurred"]
 
             });
             return;
@@ -109,7 +109,7 @@ exports.update = function (req, res, next) {
             res.json({
                 status: 0,
                 data: {},
-                erros: error
+                errors: [["An error has occurred"]]
 
             });
             return;
@@ -138,7 +138,8 @@ exports.update = function (req, res, next) {
             if (error){
                 res.json({
                     status: 0,
-                    data: error
+                    data: {},
+                    errors: ["An error has occurred"]
                 });
                 return;
             }
@@ -156,7 +157,8 @@ exports.delete = function (req, res, next) {
         if (error) {
             res.json({
                 status: 0,
-                data: error
+                data: {},
+                errors: ["An error has occurred"]
             });
             return;
         }
