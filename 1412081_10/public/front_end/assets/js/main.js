@@ -2,6 +2,7 @@ var HOST_API = 'http://localhost:3000';
 
 var student_rows_template = Handlebars.compile($("#student-rows-template").html());
 var student_form_template = Handlebars.compile($("#modal-content-template").html());
+var alert_template = Handlebars.compile($("#alert-template").html());
 
 $(document).ready(update_student_list);
 
@@ -12,7 +13,9 @@ function update_student_list() {
             $('#student-list').html(html);
         }
         else {
-            alert(response.errors);
+            response.errors.forEach(function (error, index) {
+                push_alert("danger", "Fail", error);
+            })
         }
     })
 }
@@ -37,13 +40,16 @@ $('body').on('click', '.update-student-btn', function () {
         if (response.status == 1){
             var data = response.data;
             data.action = 'update';
+            data.id = $(this).data('id');
             var html = student_form_template(data);
             $('#modal-content').html(html);
 
             $('#myModal').modal('show');
         }
         else {
-            alert(response.errors);
+            response.errors.forEach(function (error, index) {
+                push_alert("danger", "Fail", error);
+            })
         }
     })
 });
@@ -61,10 +67,14 @@ $('body').on('click', '.delete-student-btn', function () {
         method: 'DELETE',
     }).done(function (response) {
         if (response.status === 1){
-            this_obj.closest('tr').fadeOut('slow');
+            this_obj.closest('tr').fadeOut('slow', function () {
+                push_alert("success", 'Success', "");
+            });
         }
         else {
-            alert(response.errors)
+            response.errors.forEach(function (error, index) {
+                push_alert("danger", "Fail", error);
+            })
         }
     })
 });
@@ -84,14 +94,62 @@ $('#modal-submit-btn').click(function () {
             if (response.status === 1){
                 update_student_list();
                 $('#myModal').modal('hide');
+                push_alert("success", 'Success', "");
             }
             else {
-                alert(response.errors);
+                response.errors.forEach(function (error, index) {
+                    push_alert("danger", "Fail", error);
+                });
+                $('#myModal').modal('hide');
             }
         })
     }
     else { // is update action
+        var data = {
+            'code': $('#student-id').val(),
+            'name': $('#student-name').val(),
+            'email': $('#student-email').val(),
+            'score': $('#student-score').val(),
+        };
 
+        var url = HOST_API + "/api/student/" + $('#id').val();
+        $.ajax({
+            url: url,
+            data: data,
+            method: 'PUT'
+        }).done(function (response) {
+            if (response.status === 1){
+                update_student_list();
+                $('#myModal').modal('hide');
+                push_alert("success", 'Success', "");
+            }
+            else {
+                response.errors.forEach(function (error, index) {
+                    push_alert("danger", "Fail", error);
+                })
+                $('#myModal').modal('hide');
+            }
+        });
     }
 });
 
+function push_alert(status, title, content) {
+    var id = Math.floor((1 + Math.random()) * 0x10000)
+        .toString(16)
+        .substring(1);
+
+    var html = alert_template({
+        id: id,
+        status: status,
+        title: title,
+        content: content
+    })
+
+    $('#alert').append(html);
+
+    $('#alert-' + id).fadeTo(2000, 500).slideUp(500, function(){
+        $('#alert-' + id).slideUp(500, function () {
+            $('#alert-' + id).remove();
+        });
+    });
+}
